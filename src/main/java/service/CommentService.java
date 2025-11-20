@@ -17,7 +17,7 @@ private final CommentDAO commentDAO;
     }
 
     public Comment findByUserIdAndCommentId(Long userId, Long commentId) {
-        return null;
+       return commentDAO.findByUserIdAndCommentId(userId,commentId);
     }
 
     public Comment addComment(Long userId, String request) {
@@ -27,14 +27,14 @@ private final CommentDAO commentDAO;
     }
 
     public List<Comment> findAllByUserId(Long userId) {
-        return List.of();
+        return commentDAO.findAllCommentsByUserId(userId);
     }
 
     public boolean deleteComment(Long userId, Long commentId) {
-        return true;
+        return commentDAO.deleteComment(userId,commentId);
     }
 
     public Comment updateComment(Long userId, Long commentId, String message) {
-        return null;
+        return commentDAO.updateComment(new Comment(commentId,message,userId,Date.valueOf(LocalDate.now())));
     }
 }
