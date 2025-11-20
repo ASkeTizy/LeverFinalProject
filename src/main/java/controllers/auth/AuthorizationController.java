@@ -1,6 +1,10 @@
 package controllers.auth;
 
+import entity.RequestPassword;
+import entity.User;
+import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,8 +14,10 @@ public class AuthorizationController {
     public String forgotPassword(@RequestBody String email) {
         return "Forgot password"+ email;
     }
-    @PostMapping("/submit")
-    public String submitPassword(@RequestBody Integer code,String password) {
+    @PostMapping(value = "/reset",consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String submitPassword(@RequestParam("code") String code,
+                                 @RequestParam("password") String password) {
+
         return "Submit password"+ code + password;
     }
     @GetMapping("/check_code")
