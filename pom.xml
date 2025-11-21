@@ -27,11 +27,23 @@
             <artifactId>tomcat-embed-jasper</artifactId>
             <version>11.0.14</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons -->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
             <version>4.0.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.liquibase/liquibase-core -->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>5.0.1</version>
         </dependency>
 
     </dependencies>

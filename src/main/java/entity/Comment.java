@@ -6,6 +6,7 @@ public record Comment (
     Long id,
     String message,
     Long authorId,
-    Date created_at
+    Date created_at,
+    Integer rate
 ){
 }

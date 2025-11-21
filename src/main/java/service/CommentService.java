@@ -20,8 +20,8 @@ private final CommentDAO commentDAO;
        return commentDAO.findByUserIdAndCommentId(userId,commentId);
     }
 
-    public Comment addComment(Long userId, String request) {
-        var comment = new Comment(0L,request,userId, Date.valueOf(LocalDate.now()));
+    public Comment addComment(Long userId, String request,Integer rate) {
+        var comment = new Comment(0L,request,userId, Date.valueOf(LocalDate.now()),rate);
         commentDAO.createComment(comment);
         return comment;
     }
@@ -34,7 +34,7 @@ private final CommentDAO commentDAO;
         return commentDAO.deleteComment(userId,commentId);
     }
 
-    public Comment updateComment(Long userId, Long commentId, String message) {
-        return commentDAO.updateComment(new Comment(commentId,message,userId,Date.valueOf(LocalDate.now())));
+    public Comment updateComment(Long userId, Long commentId, String message,Integer rate) {
+        return commentDAO.updateComment(new Comment(commentId,message,userId,Date.valueOf(LocalDate.now()),rate));
     }
 }

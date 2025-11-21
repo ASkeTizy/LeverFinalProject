@@ -9,16 +9,10 @@ import java.util.List;
 
 @Repository
 public class CommentDAO {
-    Connection connection;
+    Connection connection = ConnectionManager.getDatabaseConnection();
 
     public CommentDAO() {
-        try {
-            connection = DriverManager.getConnection(
-                    "jdbc:postgresql://localhost:5432/mydatabase", "user", "secret"
-            );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     public List<Comment> findAllCommentsByUserId(Long userId) {
@@ -34,7 +28,8 @@ public class CommentDAO {
                                 rs.getLong("id"),
                                 rs.getString("message"),
                                 rs.getLong("author_id"),
-                                rs.getDate("created_at")
+                                rs.getDate("created_at"),
+                                rs.getInt("rate")
                         )
                 );
 
@@ -48,12 +43,13 @@ public class CommentDAO {
     }
 
     public void createComment(Comment comment) {
-        String sql = "INSERT INTO comments (message, author_id, created_at) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO comments (message, author_id, created_at,rate) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 
             stmt.setString(1, comment.message());          // message
             stmt.setLong(2, comment.authorId());                       // author_id
             stmt.setDate(3, comment.created_at()); // created_at
+            stmt.setInt(4, comment.rate()); // created_at
 
             int rows = stmt.executeUpdate();
             System.out.println("Inserted rows: " + rows);
@@ -77,7 +73,8 @@ public class CommentDAO {
                                 rs.getLong("id"),
                                 rs.getString("message"),
                                 rs.getLong("author_id"),
-                                rs.getDate("created_at")
+                                rs.getDate("created_at"),
+                                rs.getInt("rate")
                         )
                 );
 
@@ -99,6 +96,7 @@ public class CommentDAO {
             stmt.setString(1, newComment.message());
             stmt.setLong(2, newComment.authorId());
             stmt.setDate(3, newComment.created_at());
+            stmt.setInt(4, newComment.rate());
 
             int rows = stmt.executeUpdate();
             System.out.println("Inserted rows: " + rows);

@@ -6,7 +6,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @ComponentScan(basePackages = {
         "controllers",
-        "service"
+        "service",
+        "dao",
+        "exception"
 }) // Replace with your actual controller package
 public class AppConfig {
     // Additional configurations or bean definitions can go here

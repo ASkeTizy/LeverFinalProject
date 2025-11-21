@@ -1,10 +1,7 @@
 package controllers.gameobject;
 
 import entity.GameObject;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import service.GameObjectService;
 
 @RestController
@@ -18,11 +15,21 @@ public class GameObjectController {
     }
 
     @PutMapping("/{objectId}")
-    public String editObject(@PathVariable Long objectId, GameObject gameObject){
-        gameObjectService.updateObject(objectId,gameObject);
+    public String editObject(@PathVariable Long objectId, @PathVariable String message,@PathVariable String text, @PathVariable Integer gameId,
+                             @PathVariable Long userId
+    ){
+        gameObjectService.updateObject(objectId,message,text,gameId,userId);
     return "Edited object";
     }
-    public String createObject(GameObject gameObject) {
-
+    public String createObject(@PathVariable String message,@PathVariable String text, @PathVariable Integer gameId,
+                               @PathVariable Long userId
+                               ) {
+        gameObjectService.createGameObject(message,text,gameId,userId);
+        return "Object created";
+    }
+    @DeleteMapping("/{objectId}")
+    public String deletObject(@PathVariable Long objectId) {
+        gameObjectService.deleteGameObject(objectId);
+        return "Object created";
     }
 }
