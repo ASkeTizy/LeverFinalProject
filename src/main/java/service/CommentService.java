@@ -1,6 +1,7 @@
 package service;
 
 import dao.CommentDAO;
+import dto.CommentDTO;
 import entity.Comment;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ private final CommentDAO commentDAO;
        return commentDAO.findByUserIdAndCommentId(userId,commentId);
     }
 
-    public Comment addComment(Long userId, String request,Integer rate) {
-        var comment = new Comment(0L,request,userId, Date.valueOf(LocalDate.now()),rate);
+    public Comment addComment(Long userId, CommentDTO commentDTO) {
+        var comment = new Comment(0L,commentDTO.message(),userId, Date.valueOf(LocalDate.now()),commentDTO.rate());
         commentDAO.createComment(comment);
         return comment;
     }
@@ -34,7 +35,7 @@ private final CommentDAO commentDAO;
         return commentDAO.deleteComment(userId,commentId);
     }
 
-    public Comment updateComment(Long userId, Long commentId, String message,Integer rate) {
-        return commentDAO.updateComment(new Comment(commentId,message,userId,Date.valueOf(LocalDate.now()),rate));
+    public Comment updateComment(Long userId, Long commentId, CommentDTO commentDTO) {
+        return commentDAO.updateComment(new Comment(commentId,commentDTO.message(),userId,Date.valueOf(LocalDate.now()),commentDTO.rate()));
     }
 }

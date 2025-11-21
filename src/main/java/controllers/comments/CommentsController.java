@@ -1,5 +1,6 @@
 package controllers.comments;
 
+import dto.CommentDTO;
 import entity.Comment;
 import org.springframework.web.bind.annotation.*;
 import service.CommentService;
@@ -20,10 +21,9 @@ public class CommentsController {
     @PostMapping
     public Comment addComment(
             @PathVariable("userId") Long userId,
-            @RequestParam("request") String request,
-            @RequestParam("rate") Integer rate) {
+            @RequestBody CommentDTO commentDTO) {
 
-        return commentService.addComment(userId, request,rate);
+        return commentService.addComment(userId, commentDTO);
 
     }
     @GetMapping
@@ -57,10 +57,9 @@ public class CommentsController {
     public Comment updateComment(
             @PathVariable("userId") Long userId,
             @PathVariable("commentId") Long commentId,
-            @RequestParam("message") String message,
-            @RequestParam("rate") Integer rate) {
+            @RequestBody CommentDTO commentDTO) {
 
-        return commentService.updateComment(userId, commentId, message,rate);
+        return commentService.updateComment(userId, commentId, commentDTO);
     }
 
 }

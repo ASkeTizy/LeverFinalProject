@@ -1,5 +1,7 @@
 package controllers.gameobject;
 
+import dto.CommentDTO;
+import dto.GameObjectDTO;
 import entity.GameObject;
 import org.springframework.web.bind.annotation.*;
 import service.GameObjectService;
@@ -15,16 +17,12 @@ public class GameObjectController {
     }
 
     @PutMapping("/{objectId}")
-    public String editObject(@PathVariable Long objectId, @PathVariable String message,@PathVariable String text, @PathVariable Integer gameId,
-                             @PathVariable Long userId
-    ){
-        gameObjectService.updateObject(objectId,message,text,gameId,userId);
+    public String editObject(@PathVariable Long objectId, @RequestBody GameObjectDTO gameObjectDTO){
+        gameObjectService.updateObject(objectId, gameObjectDTO);
     return "Edited object";
     }
-    public String createObject(@PathVariable String message,@PathVariable String text, @PathVariable Integer gameId,
-                               @PathVariable Long userId
-                               ) {
-        gameObjectService.createGameObject(message,text,gameId,userId);
+    public String createObject(@RequestBody GameObjectDTO gameObjectDTO) {
+        gameObjectService.createGameObject(gameObjectDTO);
         return "Object created";
     }
     @DeleteMapping("/{objectId}")
