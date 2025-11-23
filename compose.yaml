@@ -7,12 +7,12 @@ services:
     restart: always
     environment:
       POSTGRES_USER: user
-      POSTGRES_PASSWORD: secret
+      POSTGRES_PASSWORD: new_secret
       POSTGRES_DB: gamestore
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - lever_db:/var/lib/postgresql/data
 #  springboot-app:
 #    build: .
 #    container_name: gamestore
@@ -23,4 +23,4 @@ services:
 #    ports:
 #      - "8080:8080"
 volumes:
-  postgres_data:
+  lever_db:
