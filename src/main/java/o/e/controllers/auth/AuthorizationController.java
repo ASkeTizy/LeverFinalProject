@@ -3,6 +3,7 @@ package o.e.controllers.auth;
 import o.e.dto.UserDTO;
 import o.e.entity.User;
 import o.e.service.AuthorizationService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,43 +25,6 @@ public class AuthorizationController {
 
     }
 
-    @GetMapping("/approve/{userId}")
-    public String approveUser(@RequestParam("userId") Long userId) {
-
-        authorizationService.approveUser(userId);
-        return "User approved";
-
-    }
-    @GetMapping("approve/{commentId}")
-    public String approveComment(@RequestParam("commentId") Long commentId) {
-
-        authorizationService.approveComment(commentId);
-        return "Comment approved";
-
-    }
-
-    @GetMapping("decline/{commentId}")
-    public String declineComment(@RequestParam("commentId") Long commentId) {
-
-        authorizationService.declineComment(commentId);
-        return "Comment decline";
-
-    }
-    @GetMapping("/decline/{userId}")
-    public String declineUser(@RequestParam("userId") Long userId) {
-
-        authorizationService.declineUser(userId);
-        return "User decline";
-
-    }
-
-    @GetMapping("/users")
-    public List<User> getUsers() {
-
-        return authorizationService.getUsers();
-
-
-    }
 
     @PostMapping("/forgot_password")
     public String forgotPassword(@RequestBody String email) {
@@ -72,6 +36,11 @@ public class AuthorizationController {
                                  @RequestParam("password") String password) {
 
         return "Submit password" + code + password;
+    }
+
+    @GetMapping("/login")
+    public String login() {
+        return "Login";
     }
 
     @GetMapping("/check_code")

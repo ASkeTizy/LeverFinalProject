@@ -4,6 +4,7 @@ import o.e.dto.GameObjectDTO;
 import o.e.entity.SellerInformationDTO;
 import o.e.entity.GameObject;
 import o.e.service.GameObjectService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,18 +26,21 @@ public class GameObjectController {
     }
 
     @PutMapping("/{objectId}")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
     public String editObject(@PathVariable("objectId") Long objectId, @RequestBody GameObjectDTO gameObjectDTO) {
         gameObjectService.updateObject(objectId, gameObjectDTO);
         return "Edited object";
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
     public GameObject createObject(@RequestBody GameObjectDTO gameObjectDTO) {
 
         return gameObjectService.createGameObject(gameObjectDTO);
     }
 
     @DeleteMapping("/{objectId}")
+    @PreAuthorize("hasAuthority('ROLE_SELLER')")
     public String deleteObject(@PathVariable("objectId") Long objectId) {
         if (gameObjectService.deleteGameObject(objectId)) {
             return "Deleted";
