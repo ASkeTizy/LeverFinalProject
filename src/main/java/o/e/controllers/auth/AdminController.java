@@ -16,15 +16,15 @@ public class AdminController {
         this.authorizationService = authorizationService;
     }
 
-    @GetMapping("/approve/{userId}")
+    @GetMapping("/approve/user/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String approveUser(@PathVariable("userId") Long userId) {
-
+        System.out.println(userId);
         authorizationService.approveUser(userId);
         return "User approved";
 
     }
-    @GetMapping("/approve/{commentId}")
+    @GetMapping("/approve/comment/{commentId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String approveComment(@PathVariable("commentId") Long commentId) {
 
@@ -33,7 +33,7 @@ public class AdminController {
 
     }
 
-    @GetMapping("decline/{commentId}")
+    @GetMapping("decline/comment/{commentId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String declineComment(@PathVariable("commentId") Long commentId) {
 
@@ -41,7 +41,7 @@ public class AdminController {
         return "Comment decline";
 
     }
-    @GetMapping("/decline/{userId}")
+    @GetMapping("/decline/user/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String declineUser(@PathVariable("userId") Long userId) {
 

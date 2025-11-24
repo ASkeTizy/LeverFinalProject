@@ -2,6 +2,7 @@ package o.e.service;
 
 import o.e.dao.UserDAO;
 import o.e.dto.UserDTO;
+import o.e.dto.VerifiedUserDTO;
 import o.e.entity.Comment;
 import o.e.entity.Roles;
 import o.e.entity.User;
@@ -20,16 +21,20 @@ public class AuthorizationService {
     private final CommentService commentService;
     Map<Long, User> users = new HashMap<>();
     private final CommentQueue queue;
+    private final VerificationService verificationService;
+    private final EmailService emailService;
 
-    public AuthorizationService(UserDAO userDAO, CommentService commentService, CommentQueue queue) {
+    public AuthorizationService(UserDAO userDAO, CommentService commentService, CommentQueue queue, VerificationService verificationService, EmailService emailService) {
         this.userDAO = userDAO;
         this.commentService = commentService;
         this.queue = queue;
+        this.verificationService = verificationService;
+        this.emailService = emailService;
     }
 
     public void addUserToConfirmation(UserDTO userDTO) {
         ++ID;
-        users.put(ID, new User(0L,
+        users.put(ID, new User(ID,
                 userDTO.firstName(),
                 userDTO.lastName(),
                 userDTO.email(),
@@ -45,9 +50,12 @@ public class AuthorizationService {
 
     public void approveUser(Long userId) {
         var user = users.get(userId);
-        if (createUser(user)) {
-            users.remove(userId);
+        System.out.println(user);
+        if(user != null) {
+            var code = verificationService.generateCode(user.email());
+            emailService.sendVerificationEmail(user.email(), code);
         }
+
     }
 
     public void declineUser(Long userId) {
@@ -69,7 +77,23 @@ public class AuthorizationService {
         return commentService.addComment(comment);
     }
 
+    private Long findUserByEmail(String email) {
+        var user = users.values().stream().filter(el -> el.email().equals(email)).findFirst();
+        return user.map(User::id).orElse(null);
+    }
+
     public void declineComment(Long commentId) {
         queue.removeComment(commentId);
+    }
+
+    public boolean verifyUser(VerifiedUserDTO verifiedUserDTO) {
+        boolean valid = verificationService.verifyCode(verifiedUserDTO.email(), verifiedUserDTO.code());
+        if (valid) {
+            var user = users.remove(findUserByEmail(verifiedUserDTO.email()));
+            if(user != null) {
+               return createUser(user);
+            }
+        }
+        return false;
     }
 }

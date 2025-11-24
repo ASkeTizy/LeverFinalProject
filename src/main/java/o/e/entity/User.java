@@ -6,8 +6,8 @@ public record User(
         Long id,
         String firstName,
         String lastName,
-        String password,
         String email,
+        String password,
         Date createdAt,
         Roles role
 ) {

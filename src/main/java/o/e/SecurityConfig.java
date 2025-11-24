@@ -18,7 +18,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@ComponentScan
+@ComponentScan(basePackages = {"o.e"})
 @EnableWebSecurity
 public class SecurityConfig {
     @Bean

@@ -1,12 +1,10 @@
 package o.e.controllers.auth;
 
 import o.e.dto.UserDTO;
-import o.e.entity.User;
+import o.e.dto.VerifiedUserDTO;
 import o.e.service.AuthorizationService;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -38,9 +36,12 @@ public class AuthorizationController {
         return "Submit password" + code + password;
     }
 
-    @GetMapping("/login")
-    public String login() {
-        return "Login";
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody VerifiedUserDTO verifiedUserDTO) {
+        if(authorizationService.verifyUser(verifiedUserDTO)) {
+            return ResponseEntity.ok().body("User created");
+        }
+        return ResponseEntity.badRequest().body("User not created");
     }
 
     @GetMapping("/check_code")
