@@ -81,11 +81,15 @@ public class AuthorizationService {
         var user = users.values().stream().filter(el -> el.email().equals(email)).findFirst();
         return user.map(User::id).orElse(null);
     }
-
+    public void updateUserPassword(VerifiedUserDTO verifiedUserDTO) {
+        userDAO.updateUserPassword(verifiedUserDTO);
+    }
     public void declineComment(Long commentId) {
         queue.removeComment(commentId);
     }
-
+    public String generateCode(String email){
+        return verificationService.generateCode(email);
+    }
     public boolean verifyUser(VerifiedUserDTO verifiedUserDTO) {
         boolean valid = verificationService.verifyCode(verifiedUserDTO.email(), verifiedUserDTO.code());
         if (valid) {

@@ -30,10 +30,9 @@ public class AuthorizationController {
     }
 
     @PostMapping("/reset")
-    public String submitPassword(@RequestParam("code") String code,
-                                 @RequestParam("password") String password) {
+    public String submitPassword(@RequestBody VerifiedUserDTO verifiedUserDTO) {
+        return String.valueOf(authorizationService.verifyUser(verifiedUserDTO));
 
-        return "Submit password" + code + password;
     }
 
     @PostMapping("/login")
@@ -44,8 +43,9 @@ public class AuthorizationController {
         return ResponseEntity.badRequest().body("User not created");
     }
 
-    @GetMapping("/check_code")
-    public String checkCode() {
-        return "Forgot password" + 1;
+    @GetMapping("/check_code/{email}")
+    public String checkCode(@PathVariable String email) {
+
+        return authorizationService.generateCode(email);
     }
 }

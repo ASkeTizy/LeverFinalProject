@@ -1,5 +1,6 @@
 package o.e.dao;
 
+import o.e.dto.VerifiedUserDTO;
 import o.e.entity.Roles;
 import o.e.entity.SellerInformationDTO;
 import o.e.entity.User;
@@ -94,5 +95,9 @@ public class UserDAO {
             System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public void updateUserPassword(VerifiedUserDTO verifiedUserDTO) {
+
     }
 }

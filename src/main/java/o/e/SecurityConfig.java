@@ -31,17 +31,17 @@ public class SecurityConfig {
                         .requestMatchers("/object/**").hasRole("SELLER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
-                )
-                .formLogin(login -> login
-                        .loginPage("/login")   // custom login page
-                        .defaultSuccessUrl("/dashboard", true)
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/home")
-                        .permitAll()
                 );
+//                .formLogin(login -> login
+//                        .loginPage("/login")   // custom login page
+//                        .defaultSuccessUrl("/dashboard", true)
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/logout")
+//                        .logoutSuccessUrl("/home")
+//                        .permitAll()
+//                );
         return http.build();
     }
 
