@@ -24,7 +24,7 @@ public class RedisConfig {
 //        mailSender.setPort(465);
 //        mailSender.setUsername("apikey"); // literal string "apikey"
 //        mailSender.setPassword("UXF2YES6D1V5TCTGEBTFB819");
-
+//
 //
 //        Properties props = mailSender.getJavaMailProperties();
 //        props.put("mail.transport.protocol", "smtp");
@@ -47,7 +47,7 @@ public class RedisConfig {
 //    }
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration("172.19.192.2", 6379);
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration("localhost", 6379);
 
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }

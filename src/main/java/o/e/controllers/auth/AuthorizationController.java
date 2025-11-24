@@ -3,8 +3,11 @@ package o.e.controllers.auth;
 import o.e.dto.UserDTO;
 import o.e.dto.VerifiedUserDTO;
 import o.e.service.AuthorizationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,15 +40,20 @@ public class AuthorizationController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody VerifiedUserDTO verifiedUserDTO) {
-        if(authorizationService.verifyUser(verifiedUserDTO)) {
+        if(authorizationService.loginUser(verifiedUserDTO.email())) {
             return ResponseEntity.ok().body("User created");
         }
         return ResponseEntity.badRequest().body("User not created");
     }
 
-    @GetMapping("/check_code/{email}")
-    public String checkCode(@PathVariable String email) {
-
-        return authorizationService.generateCode(email);
+    @PostMapping("/check_code")
+    public ResponseEntity<String> checkCode(@RequestBody Map<String, String> payload) {
+        try {
+            authorizationService.generateCode(payload.get("email"));
+            return ResponseEntity.ok("Verification code sent");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to send code");
+        }
     }
 }

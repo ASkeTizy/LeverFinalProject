@@ -4,6 +4,7 @@ import o.e.dto.VerifiedUserDTO;
 import o.e.entity.Roles;
 import o.e.entity.SellerInformationDTO;
 import o.e.entity.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
@@ -108,6 +109,37 @@ public class UserDAO {
             int rows = stmt.executeUpdate();
 
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public User findByEmail(String email){
+        String sql = "SELECT * FROM \"user\" WHERE email = ?";
+
+        try (PreparedStatement stmt = provider.getConnection().prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            List<User> users = new ArrayList<>();
+            while (rs.next()) {
+                users.add(new User(
+                                rs.getLong("id"),
+                                rs.getString("first_name"),
+                                rs.getString("last_name"),
+                                rs.getString("email"),
+                                rs.getString("password"),
+                                rs.getDate("created_at"),
+                                Roles.valueOf(rs.getString("role"))
+                        )
+                );
+
+            }
+            if (users.size() == 1) {
+                return users.getFirst();
+            } else return null;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
     }

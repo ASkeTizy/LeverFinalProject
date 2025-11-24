@@ -26,21 +26,21 @@ public class GameObjectController {
     }
 
     @PutMapping("/{objectId}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
     public String editObject(@PathVariable("objectId") Long objectId, @RequestBody GameObjectDTO gameObjectDTO) {
         gameObjectService.updateObject(objectId, gameObjectDTO);
         return "Edited object";
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
     public GameObject createObject(@RequestBody GameObjectDTO gameObjectDTO) {
 
         return gameObjectService.createGameObject(gameObjectDTO);
     }
 
     @DeleteMapping("/{objectId}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
     public String deleteObject(@PathVariable("objectId") Long objectId) {
         if (gameObjectService.deleteGameObject(objectId)) {
             return "Deleted";

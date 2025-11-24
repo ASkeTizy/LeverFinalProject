@@ -19,17 +19,19 @@ public class AuthorizationService {
     private static Long ID = 0L;
     private final UserDAO userDAO;
     private final CommentService commentService;
-    Map<Long, User> users = new HashMap<>();
     private final CommentQueue queue;
     private final VerificationService verificationService;
     private final EmailService emailService;
+    private final CustomUserDetailsService customUserDetailsService;
+    Map<Long, User> users = new HashMap<>();
 
-    public AuthorizationService(UserDAO userDAO, CommentService commentService, CommentQueue queue, VerificationService verificationService, EmailService emailService) {
+    public AuthorizationService(UserDAO userDAO, CommentService commentService, CommentQueue queue, VerificationService verificationService, EmailService emailService, CustomUserDetailsService customUserDetailsService) {
         this.userDAO = userDAO;
         this.commentService = commentService;
         this.queue = queue;
         this.verificationService = verificationService;
         this.emailService = emailService;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     public void addUserToConfirmation(UserDTO userDTO) {
@@ -51,11 +53,16 @@ public class AuthorizationService {
     public void approveUser(Long userId) {
         var user = users.get(userId);
         System.out.println(user);
-        if(user != null) {
+        if (user != null) {
             var code = verificationService.generateCode(user.email());
             emailService.sendVerificationEmail(user.email(), code);
         }
 
+    }
+
+    public boolean loginUser(String email) {
+        customUserDetailsService.loadUserByUsername(email);
+        return true;
     }
 
     public void declineUser(Long userId) {
@@ -81,22 +88,28 @@ public class AuthorizationService {
         var user = users.values().stream().filter(el -> el.email().equals(email)).findFirst();
         return user.map(User::id).orElse(null);
     }
+
     public void updateUserPassword(User user) {
         userDAO.updateUserPassword(user);
     }
+
     public void declineComment(Long commentId) {
         queue.removeComment(commentId);
     }
-    public String generateCode(String email){
-        return verificationService.generateCode(email);
+
+    public void generateCode(String email) {
+        var code = verificationService.generateCode(email);
+        emailService.sendVerificationEmail(email, code);
+
     }
+
     public boolean verifyUser(VerifiedUserDTO verifiedUserDTO) {
         boolean valid = verificationService.verifyCode(verifiedUserDTO.email(), verifiedUserDTO.code());
         if (valid) {
             var user = users.remove(findUserByEmail(verifiedUserDTO.email()));
-            if(user != null) {
-              updateUserPassword(user);
-              return true;
+            if (user != null) {
+                updateUserPassword(user);
+                return true;
             }
         }
         return false;

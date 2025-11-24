@@ -1,9 +1,10 @@
 package o.e;
 
 import jakarta.servlet.Filter;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-
+@Component
 public class DSInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
