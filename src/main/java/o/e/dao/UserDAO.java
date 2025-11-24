@@ -97,7 +97,18 @@ public class UserDAO {
         }
     }
 
-    public void updateUserPassword(VerifiedUserDTO verifiedUserDTO) {
+    public void updateUserPassword(User user) {
+        String sql = "UPDATE \"user\" SET password = ? WHERE email = ? and role = ?";
+        try (PreparedStatement stmt = provider.getConnection().prepareStatement(sql)) {
 
+            stmt.setString(1, user.password());
+            stmt.setString(2, user.email());
+            stmt.setString(3, user.role().name());
+
+            int rows = stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

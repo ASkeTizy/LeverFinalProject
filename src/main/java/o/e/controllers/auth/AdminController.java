@@ -19,7 +19,7 @@ public class AdminController {
     @GetMapping("/approve/user/{userId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String approveUser(@PathVariable("userId") Long userId) {
-        System.out.println(userId);
+
         authorizationService.approveUser(userId);
         return "User approved";
 

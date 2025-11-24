@@ -26,7 +26,7 @@ public class AuthorizationController {
 
     @PostMapping("/forgot_password")
     public String forgotPassword(@RequestBody String email) {
-        return "Forgot password" + email;
+        return authorizationService.forgotPassword(email);
     }
 
     @PostMapping("/reset")

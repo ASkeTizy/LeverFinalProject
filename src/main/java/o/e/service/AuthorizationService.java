@@ -81,8 +81,8 @@ public class AuthorizationService {
         var user = users.values().stream().filter(el -> el.email().equals(email)).findFirst();
         return user.map(User::id).orElse(null);
     }
-    public void updateUserPassword(VerifiedUserDTO verifiedUserDTO) {
-        userDAO.updateUserPassword(verifiedUserDTO);
+    public void updateUserPassword(User user) {
+        userDAO.updateUserPassword(user);
     }
     public void declineComment(Long commentId) {
         queue.removeComment(commentId);
@@ -95,9 +95,14 @@ public class AuthorizationService {
         if (valid) {
             var user = users.remove(findUserByEmail(verifiedUserDTO.email()));
             if(user != null) {
-               return createUser(user);
+              updateUserPassword(user);
+              return true;
             }
         }
         return false;
+    }
+
+    public String forgotPassword(String email) {
+        return verificationService.generateCode(email);
     }
 }
