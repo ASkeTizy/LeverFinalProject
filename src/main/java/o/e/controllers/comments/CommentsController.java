@@ -3,8 +3,6 @@ package o.e.controllers.comments;
 import o.e.dto.CommentDTO;
 import o.e.entity.Comment;
 import o.e.service.CommentService;
-import org.apache.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

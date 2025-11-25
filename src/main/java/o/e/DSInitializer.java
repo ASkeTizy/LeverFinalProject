@@ -9,12 +9,12 @@ public class DSInitializer extends AbstractAnnotationConfigDispatcherServletInit
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class[]{  LiquibaseConfig.class, DbConfig.class  };
+        return null;
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{ SecurityConfig.class, AppConfig.class  };
+        return new Class[]{ SecurityConfig.class, AppConfig.class,DbConfig.class  };
     }
 
     @Override

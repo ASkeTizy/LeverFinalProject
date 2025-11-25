@@ -1,11 +1,13 @@
 package o.e.service;
 
-import o.e.dao.UserDAO;
 import o.e.dto.UserDTO;
 import o.e.dto.VerifiedUserDTO;
 import o.e.entity.Comment;
 import o.e.entity.Roles;
 import o.e.entity.User;
+import o.e.exception.ResourceNotFoundException;
+import o.e.exception.UserNotVerifiedException;
+import o.e.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -13,20 +15,22 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Service
 public class AuthorizationService {
     private static Long ID = 0L;
-    private final UserDAO userDAO;
+    private final UserRepository userRepository;
     private final CommentService commentService;
     private final CommentQueue queue;
     private final VerificationService verificationService;
     private final EmailService emailService;
     private final CustomUserDetailsService customUserDetailsService;
     Map<Long, User> users = new HashMap<>();
+    Map<String, User> approvedUsers = new HashMap<>();
 
-    public AuthorizationService(UserDAO userDAO, CommentService commentService, CommentQueue queue, VerificationService verificationService, EmailService emailService, CustomUserDetailsService customUserDetailsService) {
-        this.userDAO = userDAO;
+    public AuthorizationService(UserRepository repository, CommentService commentService, CommentQueue queue, VerificationService verificationService, EmailService emailService, CustomUserDetailsService customUserDetailsService) {
+        this.userRepository = repository;
         this.commentService = commentService;
         this.queue = queue;
         this.verificationService = verificationService;
@@ -45,18 +49,20 @@ public class AuthorizationService {
                 Roles.SELLER));
     }
 
-    private boolean createUser(User user) {
+    private User createUser(User user) {
 
-        return userDAO.addUser(user);
+        return userRepository.save(user);
     }
 
     public void approveUser(Long userId) {
         var user = users.get(userId);
-        System.out.println(user);
+
         if (user != null) {
-            var code = verificationService.generateCode(user.email());
-            emailService.sendVerificationEmail(user.email(), code);
-        }
+            var code = verificationService.generateCode(user.getEmail());
+            emailService.sendVerificationEmail(user.getEmail(), code);
+            approvedUsers.put(user.getEmail(), user);
+            users.remove(userId);
+        } else throw new ResourceNotFoundException("User not found" + userId);
 
     }
 
@@ -73,11 +79,11 @@ public class AuthorizationService {
         return users.values().stream().toList();
     }
 
-    public void approveComment(Long commentId) {
+    public void approveComment(Integer commentId) {
         var comment = queue.getComments().get(commentId);
         if (createComment(comment) != null) {
             queue.removeComment(commentId);
-        }
+        } else throw new ResourceNotFoundException("Comment not found in inner queuer" + commentId);
     }
 
     private Comment createComment(Comment comment) {
@@ -85,15 +91,21 @@ public class AuthorizationService {
     }
 
     private Long findUserByEmail(String email) {
-        var user = users.values().stream().filter(el -> el.email().equals(email)).findFirst();
-        return user.map(User::id).orElse(null);
+        var user = users.values().stream().filter(el -> el.getEmail().equals(email)).findFirst();
+        return user.map(User::getId).orElse(null);
     }
 
-    public void updateUserPassword(User user) {
-        userDAO.updateUserPassword(user);
+    public User updateUserPassword(VerifiedUserDTO user) {
+        if (verifyUser(user.code(), user.email()) != null) {
+            var dbUser = userRepository.findByEmail(user.email()).orElseThrow(
+                    () -> new NoSuchElementException("no user with email " + user.email()));
+            dbUser.setPassword(user.password());
+           return userRepository.save(dbUser);
+        }
+        return null;
     }
 
-    public void declineComment(Long commentId) {
+    public void declineComment(Integer commentId) {
         queue.removeComment(commentId);
     }
 
@@ -103,16 +115,12 @@ public class AuthorizationService {
 
     }
 
-    public boolean verifyUser(VerifiedUserDTO verifiedUserDTO) {
-        boolean valid = verificationService.verifyCode(verifiedUserDTO.email(), verifiedUserDTO.code());
+    public User verifyUser(String code, String email) {
+        boolean valid = verificationService.verifyCode(email, code);
         if (valid) {
-            var user = users.remove(findUserByEmail(verifiedUserDTO.email()));
-            if (user != null) {
-                updateUserPassword(user);
-                return true;
-            }
-        }
-        return false;
+            return approvedUsers.get(email);
+
+        } else throw new UserNotVerifiedException("User " + email + " not verified");
     }
 
     public String forgotPassword(String email) {

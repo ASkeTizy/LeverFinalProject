@@ -2,6 +2,7 @@ package o.e.entity;
 
 
 import jakarta.persistence.*;
+
 import java.sql.Date;
 
 
@@ -24,7 +25,8 @@ public class Comment {
     private Integer rate;
 
     // Конструкторы, геттеры/сеттеры
-    public Comment() {}
+    public Comment() {
+    }
 
     public Comment(Long id, String message, Long authorId, Date createdAt, Integer rate) {
         this.id = id;

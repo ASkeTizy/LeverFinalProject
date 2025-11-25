@@ -22,7 +22,7 @@ public class CommentQueue {
                 Date.valueOf(LocalDate.now()),
                 commentDTO.rate()));
     }
-    public void removeComment(Long commentId) {
+    public void removeComment(Integer commentId) {
         comments.remove(commentId);
     }
 

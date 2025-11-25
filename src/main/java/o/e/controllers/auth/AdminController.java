@@ -26,7 +26,7 @@ public class AdminController {
     }
     @GetMapping("/approve/comment/{commentId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String approveComment(@PathVariable("commentId") Long commentId) {
+    public String approveComment(@PathVariable("commentId") Integer commentId) {
 
         authorizationService.approveComment(commentId);
         return "Comment approved";
@@ -35,7 +35,7 @@ public class AdminController {
 
     @GetMapping("decline/comment/{commentId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String declineComment(@PathVariable("commentId") Long commentId) {
+    public String declineComment(@PathVariable("commentId") Integer commentId) {
 
         authorizationService.declineComment(commentId);
         return "Comment decline";

@@ -4,9 +4,9 @@ import org.springframework.security.web.context.AbstractSecurityWebApplicationIn
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class GamesWebInitializer extends AbstractSecurityWebApplicationInitializer {
-//    public GamesWebInitializer() {
-//        super(AppConfig.class);
-//    }
+    public GamesWebInitializer() {
+        super(AppConfig.class);
+    }
 
 }
 

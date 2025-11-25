@@ -2,6 +2,7 @@ package o.e.controllers.auth;
 
 import o.e.dto.UserDTO;
 import o.e.dto.VerifiedUserDTO;
+import o.e.entity.User;
 import o.e.service.AuthorizationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,11 +34,14 @@ public class AuthorizationController {
     }
 
     @PostMapping("/reset")
-    public String submitPassword(@RequestBody VerifiedUserDTO verifiedUserDTO) {
-        return String.valueOf(authorizationService.verifyUser(verifiedUserDTO));
+    public User submitPassword(@RequestBody VerifiedUserDTO verifiedUserDTO) {
+        return authorizationService.updateUserPassword(verifiedUserDTO);
 
     }
-
+    @PostMapping("/confirm")
+    public User confirmUser(@RequestParam String code, @RequestParam String email) {
+        return authorizationService.verifyUser(code,email);
+    }
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody VerifiedUserDTO verifiedUserDTO) {
         if(authorizationService.loginUser(verifiedUserDTO.email())) {

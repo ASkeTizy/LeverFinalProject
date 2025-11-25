@@ -26,12 +26,12 @@ public class UserDAO {
                 "VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = provider.getConnection().prepareStatement(sql)) {
 
-            stmt.setString(1, user.firstName());
-            stmt.setString(2, user.lastName());
-            stmt.setString(3, user.password());
-            stmt.setString(4, user.email());
-            stmt.setDate(5, user.createdAt());
-            stmt.setString(6, user.role().name());
+            stmt.setString(1, user.getFirstName());
+            stmt.setString(2, user.getFirstName());
+            stmt.setString(3, user.getPassword());
+            stmt.setString(4, user.getEmail());
+            stmt.setDate(5, user.getCreatedAt());
+            stmt.setString(6, user.getRole().name());
 
             int rows = stmt.executeUpdate();
             return rows > 0;
@@ -102,9 +102,9 @@ public class UserDAO {
         String sql = "UPDATE \"user\" SET password = ? WHERE email = ? and role = ?";
         try (PreparedStatement stmt = provider.getConnection().prepareStatement(sql)) {
 
-            stmt.setString(1, user.password());
-            stmt.setString(2, user.email());
-            stmt.setString(3, user.role().name());
+            stmt.setString(1, user.getPassword());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getRole().name());
 
             int rows = stmt.executeUpdate();
 
