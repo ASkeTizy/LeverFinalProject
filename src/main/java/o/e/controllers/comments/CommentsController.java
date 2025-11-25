@@ -3,6 +3,8 @@ package o.e.controllers.comments;
 import o.e.dto.CommentDTO;
 import o.e.entity.Comment;
 import o.e.service.CommentService;
+import org.apache.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +41,6 @@ public class CommentsController {
     }
 
 
-
     @GetMapping("/{commentId}")
     public Comment getCommentByUserAndId(
             @PathVariable("userId") Long userId,
@@ -52,11 +53,8 @@ public class CommentsController {
     public String deleteComment(
             @PathVariable("userId") Long userId,
             @PathVariable("commentId") Long commentId) {
-        if (commentService.deleteComment(userId, commentId)) {
-            return "Deleted";
-        } else {
-            return "Not deleted";
-        }
+        commentService.deleteComment(userId, commentId);
+        return "deleted";
     }
 
     @PutMapping("/{commentId}")
@@ -66,6 +64,7 @@ public class CommentsController {
             @RequestBody CommentDTO commentDTO) {
 
         return commentService.updateComment(userId, commentId, commentDTO);
+
     }
 
 }

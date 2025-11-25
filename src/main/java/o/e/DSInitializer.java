@@ -4,17 +4,17 @@ import jakarta.servlet.Filter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-@Component
+
 public class DSInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return null;
+        return new Class[]{  LiquibaseConfig.class, DbConfig.class  };
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{ SecurityConfig.class, AppConfig.class };
+        return new Class[]{ SecurityConfig.class, AppConfig.class  };
     }
 
     @Override

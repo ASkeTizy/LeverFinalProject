@@ -13,4 +13,5 @@ public class GlobalExceptionHandler {
 //        log.error(e.getMessage(), e);
         return new ResponseEntity<>(new ControllerExceptionHandler(HttpStatus.NOT_FOUND.value(), e.getMessage()), HttpStatus.NOT_FOUND);
     }
+
 }

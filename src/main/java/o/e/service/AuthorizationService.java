@@ -81,7 +81,7 @@ public class AuthorizationService {
     }
 
     private Comment createComment(Comment comment) {
-        return commentService.addComment(comment);
+        return commentService.createComment(comment);
     }
 
     private Long findUserByEmail(String email) {

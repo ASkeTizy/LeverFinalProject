@@ -5,6 +5,8 @@ import o.e.dao.UserDAO;
 import o.e.dto.CommentDTO;
 import o.e.entity.Comment;
 import o.e.entity.SellerInformationDTO;
+import o.e.exception.ResourceNotFoundException;
+import o.e.repository.CommentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -12,26 +14,28 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+
 public class CommentService {
-    private final CommentDAO commentDAO;
+    private final CommentRepository commentRepository;
     private final UserDAO userDao;
     private final CommentQueue queue;
 
-    public CommentService(CommentDAO commentDAO, UserDAO userDao, CommentQueue queue) {
-        this.commentDAO = commentDAO;
+    public CommentService(CommentRepository commentRepository, UserDAO userDao, CommentQueue queue) {
+        this.commentRepository = commentRepository;
         this.userDao = userDao;
         this.queue = queue;
     }
 
 
     public Comment findByUserIdAndCommentId(Long userId, Long commentId) {
-        return commentDAO.findByUserIdAndCommentId(userId, commentId);
+        return commentRepository.findByAuthorIdAndId(userId, commentId).orElseThrow(() ->new ResourceNotFoundException("Comment not found"));
     }
 
-    public Comment addComment(Comment comment) {
-        var user = userDao.findUserById(comment.authorId());
+    public Comment createComment(Comment comment) {
+        var user = userDao.findUserById(comment.getAuthorId());
         if (user != null) {
-            return commentDAO.createComment(comment);
+            return commentRepository.save(comment);
+
         }
         return null;
     }
@@ -45,24 +49,29 @@ public class CommentService {
         return false;
     }
 
-    public List<Comment> findAllByUserId(Long userId) {
-        return commentDAO.findAllCommentsByUserId(userId);
+    public List<Comment> findAllByUserId(Long authorId) {
+       List<Comment> comments = commentRepository.findAllByAuthorId(authorId);
+        if( comments.isEmpty()){
+            throw new ResourceNotFoundException("Not found comments by authorID" + authorId);
+        }
+        return comments;
     }
 
-    public boolean deleteComment(Long userId, Long commentId) {
-        return commentDAO.deleteComment(userId, commentId);
+    public void deleteComment(Long userId, Long commentId) {
+        Comment comment = findByUserIdAndCommentId(userId,commentId);
+        commentRepository.delete(comment);
     }
 
     public Comment updateComment(Long userId, Long commentId, CommentDTO commentDTO) {
-        return commentDAO.updateComment(new Comment(commentId, commentDTO.message(), userId, null, commentDTO.rate()));
+        Comment comment = findByUserIdAndCommentId(userId,commentId);
+        comment.setRate(commentDTO.rate());
+        comment.setMessage(commentDTO.message());
+        return commentRepository.save(comment);
     }
 
     public double calculateSellerRating(Long userId) {
-        var comments = commentDAO.findAllCommentsByUserId(userId);
-        if (!comments.isEmpty()) {
-            return comments.stream().mapToDouble(Comment::rate).average().orElse(0);
-        }
-        return 0;
+        List<Comment> comments = findAllByUserId(userId);
+        return comments.stream().mapToDouble(Comment::getRate).average().orElse(0);
     }
 
     public List<SellerInformationDTO> setSellerRate(List<SellerInformationDTO> users) {
