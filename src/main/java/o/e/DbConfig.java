@@ -25,8 +25,8 @@ public class DbConfig {
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("org.postgresql.Driver");
-//        ds.setUrl("jdbc:postgresql://localhost:5433/gamestore");
-            ds.setUrl("jdbc:postgresql://172.19.192.2:5433/gamestore");
+        ds.setUrl("jdbc:postgresql://localhost:5433/gamestore");
+//            ds.setUrl("jdbc:postgresql://172.19.192.2:5433/gamestore");
         ds.setUsername("user");
         ds.setPassword("new_secret");
         System.out.println("Connecting to DB: " + ds.getUrl() + " with user " + ds.getUsername());
