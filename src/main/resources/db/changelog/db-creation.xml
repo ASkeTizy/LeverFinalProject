@@ -6,7 +6,7 @@
 
 <changeSet id="4" author="me">
     <sql>CREATE TYPE roles AS ENUM ('admin','seller')</sql>
-    <createTable tableName="user">
+    <createTable tableName="users">
         <column name="id" type="int">
             <constraints primaryKey="true"/>
         </column>
@@ -71,7 +71,7 @@
                       incrementBy="1"
                       schemaName="public"
                       startWith="1"
-                      tableName="user"/>
+                      tableName="users"/>
     <addAutoIncrement catalogName="gamestore"
                       columnDataType="int"
                       columnName="id"

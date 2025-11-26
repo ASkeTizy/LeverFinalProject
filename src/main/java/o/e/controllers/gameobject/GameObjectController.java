@@ -27,9 +27,9 @@ public class GameObjectController {
 
     @PutMapping("/{objectId}")
     @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
-    public String editObject(@PathVariable("objectId") Long objectId, @RequestBody GameObjectDTO gameObjectDTO) {
-        gameObjectService.updateObject(objectId, gameObjectDTO);
-        return "Edited object";
+    public GameObject editObject(@PathVariable("objectId") Long objectId, @RequestBody GameObjectDTO gameObjectDTO) {
+       return gameObjectService.updateObject(objectId, gameObjectDTO);
+
     }
 
     @PostMapping
@@ -41,12 +41,8 @@ public class GameObjectController {
 
     @DeleteMapping("/{objectId}")
     @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
-    public String deleteObject(@PathVariable("objectId") Long objectId) {
-        if (gameObjectService.deleteGameObject(objectId)) {
-            return "Deleted";
-        } else {
-            return "Not deleted";
-        }
+    public GameObject deleteObject(@RequestBody Long objectId) {
+        return gameObjectService.deleteGameObject(objectId);
     }
 
     @GetMapping("{gameId}/{startRate}/{endRate}")
@@ -54,7 +50,7 @@ public class GameObjectController {
                                                     @PathVariable("startRate") Integer startRate,
                                                     @PathVariable("endRate") Integer endRate) {
 
-        return gameObjectService.getUsersByGameAndRate(gameName,startRate,endRate);
+        return gameObjectService.getUsersByGameAndRate(gameName, startRate, endRate);
 
     }
 }

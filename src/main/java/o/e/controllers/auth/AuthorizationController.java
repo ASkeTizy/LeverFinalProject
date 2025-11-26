@@ -1,5 +1,7 @@
 package o.e.controllers.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
+import o.e.dto.ConfirmDTO;
 import o.e.dto.UserDTO;
 import o.e.dto.VerifiedUserDTO;
 import o.e.entity.User;
@@ -19,7 +21,7 @@ public class AuthorizationController {
         this.authorizationService = authorizationService;
     }
 
-    @PostMapping("/create")
+    @PostMapping("/register")
     public String createUser(@RequestBody UserDTO userDto) {
 
         authorizationService.addUserToConfirmation(userDto);
@@ -39,15 +41,15 @@ public class AuthorizationController {
 
     }
     @PostMapping("/confirm")
-    public User confirmUser(@RequestParam String code, @RequestParam String email) {
-        return authorizationService.verifyUser(code,email);
+    public User confirmUser(@RequestBody ConfirmDTO confirmDTO) {
+        return authorizationService.verifyUser(confirmDTO.code(), confirmDTO.email());
     }
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody VerifiedUserDTO verifiedUserDTO) {
-        if(authorizationService.loginUser(verifiedUserDTO.email())) {
-            return ResponseEntity.ok().body("User created");
+    public ResponseEntity<?> login(@RequestParam("email") String email, @RequestParam("password") String password, HttpServletRequest request) {
+        if(authorizationService.loginUser(email,password,request)) {
+            return ResponseEntity.ok().body("User authorized");
         }
-        return ResponseEntity.badRequest().body("User not created");
+        return ResponseEntity.badRequest().body("User not authorized");
     }
 
     @PostMapping("/check_code")

@@ -1,5 +1,7 @@
 package o.e.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import o.e.dto.UserDTO;
 import o.e.dto.VerifiedUserDTO;
 import o.e.entity.Comment;
@@ -8,14 +10,15 @@ import o.e.entity.User;
 import o.e.exception.ResourceNotFoundException;
 import o.e.exception.UserNotVerifiedException;
 import o.e.repository.UserRepository;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Service
 public class AuthorizationService {
@@ -37,16 +40,23 @@ public class AuthorizationService {
         this.emailService = emailService;
         this.customUserDetailsService = customUserDetailsService;
     }
-
+    private Roles defineRole(String role) {
+        return switch (role) {
+            case "SELLER" -> Roles.SELLER;
+            case "ADMIN" -> Roles.ADMIN;
+            default -> Roles.SELLER;
+        };
+    }
     public void addUserToConfirmation(UserDTO userDTO) {
         ++ID;
+
         users.put(ID, new User(ID,
                 userDTO.firstName(),
                 userDTO.lastName(),
-                userDTO.email(),
                 userDTO.password(),
+                userDTO.email(),
                 Date.valueOf(LocalDate.now()),
-                Roles.SELLER));
+                defineRole(userDTO.role())));
     }
 
     private User createUser(User user) {
@@ -59,16 +69,28 @@ public class AuthorizationService {
 
         if (user != null) {
             var code = verificationService.generateCode(user.getEmail());
-            emailService.sendVerificationEmail(user.getEmail(), code);
+//            emailService.sendVerificationEmail(user.getEmail(), code);
             approvedUsers.put(user.getEmail(), user);
             users.remove(userId);
         } else throw new ResourceNotFoundException("User not found" + userId);
 
     }
 
-    public boolean loginUser(String email) {
-        customUserDetailsService.loadUserByUsername(email);
-        return true;
+    public boolean loginUser(String email, String password, HttpServletRequest request) {
+        var user =customUserDetailsService.loadUserByUsername(email);
+        if(Objects.equals(user.getPassword(), password)) {
+            var authToken = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authToken);
+            SecurityContextHolder.setContext(context);
+
+            // сохранить контекст в сессии
+            HttpSession session = request.getSession(true);
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+            return true;
+        }
+        return false;
     }
 
     public void declineUser(Long userId) {
@@ -76,7 +98,8 @@ public class AuthorizationService {
     }
 
     public List<User> getUsers() {
-        return users.values().stream().toList();
+        return userRepository.findAll();
+//        return users.values().stream().toList();
     }
 
     public void approveComment(Integer commentId) {
@@ -100,7 +123,7 @@ public class AuthorizationService {
             var dbUser = userRepository.findByEmail(user.email()).orElseThrow(
                     () -> new NoSuchElementException("no user with email " + user.email()));
             dbUser.setPassword(user.password());
-           return userRepository.save(dbUser);
+            return userRepository.save(dbUser);
         }
         return null;
     }
@@ -116,10 +139,12 @@ public class AuthorizationService {
     }
 
     public User verifyUser(String code, String email) {
-        boolean valid = verificationService.verifyCode(email, code);
+//        boolean valid = verificationService.verifyCode(email, code);
+        boolean valid = true;
         if (valid) {
-            return approvedUsers.get(email);
-
+            User user = approvedUsers.get(email);
+            if(user == null) throw new ResourceNotFoundException("NO user with this email");
+            return userRepository.save(user);
         } else throw new UserNotVerifiedException("User " + email + " not verified");
     }
 

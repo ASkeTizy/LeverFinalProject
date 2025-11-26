@@ -1,12 +1,11 @@
 package o.e.service;
 
-import o.e.dao.CommentDAO;
-import o.e.dao.UserDAO;
 import o.e.dto.CommentDTO;
 import o.e.entity.Comment;
 import o.e.entity.SellerInformationDTO;
 import o.e.exception.ResourceNotFoundException;
 import o.e.repository.CommentRepository;
+import o.e.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -17,12 +16,12 @@ import java.util.stream.Collectors;
 
 public class CommentService {
     private final CommentRepository commentRepository;
-    private final UserDAO userDao;
+    private final UserRepository userRepository;
     private final CommentQueue queue;
 
-    public CommentService(CommentRepository commentRepository, UserDAO userDao, CommentQueue queue) {
+    public CommentService(CommentRepository commentRepository, UserRepository userRepository, CommentQueue queue) {
         this.commentRepository = commentRepository;
-        this.userDao = userDao;
+        this.userRepository = userRepository;
         this.queue = queue;
     }
 
@@ -32,21 +31,20 @@ public class CommentService {
     }
 
     public Comment createComment(Comment comment) {
-        var user = userDao.findUserById(comment.getAuthorId());
-        if (user != null) {
-            return commentRepository.save(comment);
 
+        if (!userRepository.existsById(comment.getAuthorId())) {
+
+            throw new ResourceNotFoundException("No such user "+comment.getAuthorId());
         }
-        return null;
+        return commentRepository.save(comment);
     }
 
     public boolean addCommentToCheck(Long userId, CommentDTO commentDTO) {
-        var user = userDao.findUserById(userId);
-        if (user != null) {
-            queue.addComment(userId, commentDTO);
-            return true;
+        if (!userRepository.existsById(userId)) {
+            return false;
         }
-        return false;
+        queue.addComment(userId, commentDTO);
+        return true;
     }
 
     public List<Comment> findAllByUserId(Long authorId) {
@@ -80,7 +78,7 @@ public class CommentService {
     }
 
     public List<SellerInformationDTO> getTopSellers() {
-        var users = userDao.findUsersWithComments();
+        var users = userRepository.findUsersWithComments();
 
         return setSellerRate(users).stream()
                 .sorted(Comparator.comparingDouble(SellerInformationDTO::getRate)

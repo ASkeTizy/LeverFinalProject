@@ -10,8 +10,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(name = "first_name")
     private String firstName;
+    @Column(name = "last_name")
     private String lastName;
     private String password;
     private String email;
@@ -21,6 +22,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Roles role;
+
+    public User() {
+    }
 
     public User(Long id, String firstName, String lastName, String password, String email, Date createdAt, Roles role) {
         this.id = id;
@@ -80,8 +84,8 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public Roles getRole() {
-        return role;
+    public String getRole() {
+        return role.name();
     }
 
     public void setRole(Roles role) {

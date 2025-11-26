@@ -1,9 +1,7 @@
 package o.e.service;
 
-import o.e.dao.UserDAO;
 import o.e.entity.CustomUserDetails;
-import o.e.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
+import o.e.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,18 +10,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserDAO userDAO;
+    private final UserRepository userRepository;
 
-    public CustomUserDetailsService(UserDAO userDAO) {
-        this.userDAO = userDAO;
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        User user = userDAO.findByEmail(email);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + email);
-        }
-        return new CustomUserDetails(user);
+
+         var user = userRepository.findByEmail(email).orElseThrow(() ->  new UsernameNotFoundException("User not found with email: " + email));
+
+         return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail())
+                .password(user.getPassword())
+                .roles(user.getRole()) // "ADMIN" or "SELLER"
+                .build();
     }
 }

@@ -21,11 +21,15 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests((authorize) -> authorize
-
-                        .anyRequest().permitAll()
+                        .requestMatchers("/auth/login", "/auth/register","/auth/confirm","/users/**","/top/sellers").permitAll()
+                        .requestMatchers("/object/**").hasAnyRole("SELLER","ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
-                .formLogin(withDefaults())
-                .httpBasic(withDefaults());
+                .formLogin(form ->
+                        form.usernameParameter("email")
+                        .passwordParameter("password"))
+                .logout(logout -> logout.permitAll());
         return http.build();
     }
 
