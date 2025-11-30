@@ -47,6 +47,10 @@ public class DbConfig {
         Properties props = new Properties();
         props.setProperty("hibernate.hbm2ddl.auto", "none");
         props.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+
+        props.setProperty("hibernate.show_sql", "true");          // вывод SQL в консоль
+        props.setProperty("hibernate.format_sql", "true");        // форматирование SQL
+        props.setProperty("hibernate.use_sql_comments", "true");
         emf.setJpaProperties(props);
 
         emf.setEntityManagerFactoryInterface(jakarta.persistence.EntityManagerFactory.class);
