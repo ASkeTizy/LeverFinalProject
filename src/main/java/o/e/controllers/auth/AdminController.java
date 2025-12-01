@@ -50,7 +50,7 @@ public class AdminController {
 
     }
 
-    @GetMapping("/lol")
+    @GetMapping("/users")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<User> getUsers() {
 

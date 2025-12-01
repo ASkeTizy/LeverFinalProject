@@ -13,6 +13,7 @@ import o.e.repository.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,7 @@ public class AuthorizationService {
         this.emailService = emailService;
         this.customUserDetailsService = customUserDetailsService;
     }
+
     private Roles defineRole(String role) {
         return switch (role) {
             case "SELLER" -> Roles.SELLER;
@@ -47,6 +49,7 @@ public class AuthorizationService {
             default -> Roles.SELLER;
         };
     }
+
     public void addUserToConfirmation(UserDTO userDTO) {
         ++ID;
 
@@ -57,6 +60,7 @@ public class AuthorizationService {
                 userDTO.email(),
                 Date.valueOf(LocalDate.now()),
                 defineRole(userDTO.role())));
+
     }
 
     private User createUser(User user) {
@@ -69,7 +73,7 @@ public class AuthorizationService {
 
         if (user != null) {
             var code = verificationService.generateCode(user.getEmail());
-//            emailService.sendVerificationEmail(user.getEmail(), code);
+            emailService.sendVerificationEmail(user.getEmail(), code);
             approvedUsers.put(user.getEmail(), user);
             users.remove(userId);
         } else throw new ResourceNotFoundException("User not found" + userId);
@@ -77,15 +81,14 @@ public class AuthorizationService {
     }
 
     public boolean loginUser(String email, String password, HttpServletRequest request) {
-        var user =customUserDetailsService.loadUserByUsername(email);
-        if(Objects.equals(user.getPassword(), password)) {
-            var authToken = new UsernamePasswordAuthenticationToken(user,null,user.getAuthorities());
+        var user = customUserDetailsService.loadUserByUsername(email);
+        if (Objects.equals(user.getPassword(), password)) {
+            var authToken = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authToken);
             SecurityContextHolder.setContext(context);
 
-            // сохранить контекст в сессии
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
             return true;
@@ -98,8 +101,8 @@ public class AuthorizationService {
     }
 
     public List<User> getUsers() {
-        return userRepository.findAll();
-//        return users.values().stream().toList();
+//        return userRepository.findAll();
+        return users.values().stream().toList();
     }
 
     public void approveComment(Integer commentId) {
@@ -139,11 +142,10 @@ public class AuthorizationService {
     }
 
     public User verifyUser(String code, String email) {
-//        boolean valid = verificationService.verifyCode(email, code);
-        boolean valid = true;
+        boolean valid = verificationService.verifyCode(email, code);
         if (valid) {
             User user = approvedUsers.get(email);
-            if(user == null) throw new ResourceNotFoundException("NO user with this email");
+            if (user == null) throw new ResourceNotFoundException("NO user with this email");
             return userRepository.save(user);
         } else throw new UserNotVerifiedException("User " + email + " not verified");
     }

@@ -2,11 +2,13 @@ package o.e.controllers.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import o.e.dto.ConfirmDTO;
+import o.e.dto.EmailCheckDTO;
 import o.e.dto.UserDTO;
 import o.e.dto.VerifiedUserDTO;
 import o.e.entity.User;
 import o.e.service.AuthorizationService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,9 +55,11 @@ public class AuthorizationController {
     }
 
     @PostMapping("/check_code")
-    public ResponseEntity<String> checkCode(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<String> checkCode(@RequestBody EmailCheckDTO dto) {
+
         try {
-            authorizationService.generateCode(payload.get("email"));
+
+            authorizationService.generateCode(dto.email());
             return ResponseEntity.ok("Verification code sent");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

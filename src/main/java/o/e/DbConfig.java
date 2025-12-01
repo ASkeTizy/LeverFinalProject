@@ -25,8 +25,8 @@ public class DbConfig {
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
         ds.setDriverClassName("org.postgresql.Driver");
-//        ds.setUrl("jdbc:postgresql://localhost:5433/gamestore");
-            ds.setUrl("jdbc:postgresql://172.19.192.2:5433/gamestore");
+        ds.setUrl("jdbc:postgresql://localhost:5433/gamestore");
+//            ds.setUrl("jdbc:postgresql://172.19.192.2:5433/gamestore");
         ds.setUsername("user");
         ds.setPassword("new_secret");
         System.out.println("Connecting to DB: " + ds.getUrl() + " with user " + ds.getUsername());
@@ -47,6 +47,10 @@ public class DbConfig {
         Properties props = new Properties();
         props.setProperty("hibernate.hbm2ddl.auto", "none");
         props.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+
+        props.setProperty("hibernate.show_sql", "true");          // вывод SQL в консоль
+        props.setProperty("hibernate.format_sql", "true");        // форматирование SQL
+        props.setProperty("hibernate.use_sql_comments", "true");
         emf.setJpaProperties(props);
 
         emf.setEntityManagerFactoryInterface(jakarta.persistence.EntityManagerFactory.class);
