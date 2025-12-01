@@ -1,6 +1,5 @@
 package o.e.service;
 
-import o.e.entity.CustomUserDetails;
 import o.e.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

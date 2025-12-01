@@ -1,5 +1,6 @@
-package o.e.entity;
+package o.e.service;
 
+import o.e.entity.User;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

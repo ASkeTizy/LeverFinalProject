@@ -1,5 +1,7 @@
 package o.e.controllers.gameobject;
 
+import o.e.controllers.annotation.AdminGrant;
+import o.e.controllers.annotation.SellerGrant;
 import o.e.dto.GameObjectDTO;
 import o.e.entity.SellerInformationDTO;
 import o.e.entity.GameObject;
@@ -26,21 +28,22 @@ public class GameObjectController {
     }
 
     @PutMapping("/{objectId}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
+    @SellerGrant
     public GameObject editObject(@PathVariable("objectId") Long objectId, @RequestBody GameObjectDTO gameObjectDTO) {
-       return gameObjectService.updateObject(objectId, gameObjectDTO);
+        return gameObjectService.updateObject(objectId, gameObjectDTO);
 
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
+    @SellerGrant
     public GameObject createObject(@RequestBody GameObjectDTO gameObjectDTO) {
 
         return gameObjectService.createGameObject(gameObjectDTO);
     }
 
     @DeleteMapping("/{objectId}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER','ROLE_ADMIN')")
+    @AdminGrant
+    @SellerGrant
     public GameObject deleteObject(@RequestBody Long objectId) {
         return gameObjectService.deleteGameObject(objectId);
     }

@@ -3,6 +3,8 @@ package o.e;
 import jakarta.persistence.EntityManagerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -12,24 +14,29 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
+import java.util.Objects;
 import java.util.Properties;
 
 
 @Configuration
 @EnableJpaRepositories(basePackages = "o.e.repository")
 @EnableTransactionManagement
+@PropertySource("classpath:application.properties")
 public class DbConfig {
+    private final Environment env;
+
+    public DbConfig(Environment env) {
+        this.env = env;
+    }
 
 
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource ds = new DriverManagerDataSource();
-        ds.setDriverClassName("org.postgresql.Driver");
-        ds.setUrl("jdbc:postgresql://localhost:5433/gamestore");
-//            ds.setUrl("jdbc:postgresql://172.19.192.2:5433/gamestore");
-        ds.setUsername("user");
-        ds.setPassword("new_secret");
-        System.out.println("Connecting to DB: " + ds.getUrl() + " with user " + ds.getUsername());
+        ds.setDriverClassName(Objects.requireNonNull(env.getProperty("db.driver")));
+        ds.setUrl(env.getProperty("db.url"));
+        ds.setUsername(env.getProperty("db.username"));
+        ds.setPassword(env.getProperty("db.password"));
         return ds;
     }
 

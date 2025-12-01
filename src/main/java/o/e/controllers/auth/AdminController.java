@@ -1,5 +1,6 @@
 package o.e.controllers.auth;
 
+import o.e.controllers.annotation.AdminGrant;
 import o.e.entity.User;
 import o.e.service.AuthorizationService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +18,7 @@ public class AdminController {
     }
 
     @GetMapping("/approve/user/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminGrant
     public String approveUser(@PathVariable("userId") Long userId) {
 
         authorizationService.approveUser(userId);
@@ -25,7 +26,7 @@ public class AdminController {
 
     }
     @GetMapping("/approve/comment/{commentId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminGrant
     public String approveComment(@PathVariable("commentId") Integer commentId) {
 
         authorizationService.approveComment(commentId);
@@ -34,7 +35,7 @@ public class AdminController {
     }
 
     @GetMapping("decline/comment/{commentId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminGrant
     public String declineComment(@PathVariable("commentId") Integer commentId) {
 
         authorizationService.declineComment(commentId);
@@ -42,7 +43,7 @@ public class AdminController {
 
     }
     @GetMapping("/decline/user/{userId}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminGrant
     public String declineUser(@PathVariable("userId") Long userId) {
 
         authorizationService.declineUser(userId);
@@ -51,7 +52,7 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminGrant
     public List<User> getUsers() {
 
         return authorizationService.getUsers();

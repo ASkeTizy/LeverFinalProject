@@ -30,16 +30,16 @@ public class AuthorizationService {
     private final VerificationService verificationService;
     private final EmailService emailService;
     private final CustomUserDetailsService customUserDetailsService;
-    Map<Long, User> users = new HashMap<>();
-    Map<String, User> approvedUsers = new HashMap<>();
+    private final UserQueue userQueue;
 
-    public AuthorizationService(UserRepository repository, CommentService commentService, CommentQueue queue, VerificationService verificationService, EmailService emailService, CustomUserDetailsService customUserDetailsService) {
+    public AuthorizationService(UserRepository repository, CommentService commentService, CommentQueue queue, VerificationService verificationService, EmailService emailService, CustomUserDetailsService customUserDetailsService, UserQueue userQueue) {
         this.userRepository = repository;
         this.commentService = commentService;
         this.queue = queue;
         this.verificationService = verificationService;
         this.emailService = emailService;
         this.customUserDetailsService = customUserDetailsService;
+        this.userQueue = userQueue;
     }
 
     private Roles defineRole(String role) {
@@ -51,15 +51,15 @@ public class AuthorizationService {
     }
 
     public void addUserToConfirmation(UserDTO userDTO) {
-        ++ID;
 
-        users.put(ID, new User(ID,
+        var user =new User(ID,
                 userDTO.firstName(),
                 userDTO.lastName(),
                 userDTO.password(),
                 userDTO.email(),
                 Date.valueOf(LocalDate.now()),
-                defineRole(userDTO.role())));
+                defineRole(userDTO.role()));
+        userQueue.addUser(user);
 
     }
 
@@ -69,7 +69,7 @@ public class AuthorizationService {
     }
 
     public void approveUser(Long userId) {
-        var user = users.get(userId);
+        var user = userQueue.getUser(userId);
 
         if (user != null) {
             var code = verificationService.generateCode(user.getEmail());
@@ -106,7 +106,7 @@ public class AuthorizationService {
     }
 
     public void approveComment(Integer commentId) {
-        var comment = queue.getComments().get(commentId);
+        var comment = queue.removeComment(commentId);
         if (createComment(comment) != null) {
             queue.removeComment(commentId);
         } else throw new ResourceNotFoundException("Comment not found in inner queuer" + commentId);

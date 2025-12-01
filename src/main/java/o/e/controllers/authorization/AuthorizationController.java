@@ -1,4 +1,4 @@
-package o.e.controllers.auth;
+package o.e.controllers.authorization;
 
 import jakarta.servlet.http.HttpServletRequest;
 import o.e.dto.ConfirmDTO;
@@ -8,11 +8,8 @@ import o.e.dto.VerifiedUserDTO;
 import o.e.entity.User;
 import o.e.service.AuthorizationService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
