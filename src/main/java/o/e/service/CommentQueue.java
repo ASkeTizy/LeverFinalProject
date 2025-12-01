@@ -1,17 +1,16 @@
 package o.e.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import o.e.dto.CommentDTO;
 import o.e.entity.Comment;
+import o.e.entity.User;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -35,6 +34,13 @@ public class CommentQueue {
             redisTemplate.delete(key);
             return comment;
         } else throw new NoSuchElementException("No element");
+    }
+    public List<Comment> getAllComments() {
+        var mapper = new ObjectMapper();
+        Set<String> keys = redisTemplate.keys("user:*");
+        return keys.stream()
+                .map(key -> (Comment) redisTemplate.opsForValue().get(key))
+                .toList();
     }
 
 }

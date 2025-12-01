@@ -13,13 +13,14 @@ import o.e.repository.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 @Service
 public class AuthorizationService {
@@ -52,7 +53,7 @@ public class AuthorizationService {
 
     public void addUserToConfirmation(UserDTO userDTO) {
 
-        var user =new User(ID,
+        var user = new User(ID,
                 userDTO.firstName(),
                 userDTO.lastName(),
                 userDTO.password(),
@@ -74,8 +75,6 @@ public class AuthorizationService {
         if (user != null) {
             var code = verificationService.generateCode(user.getEmail());
             emailService.sendVerificationEmail(user.getEmail(), code);
-            approvedUsers.put(user.getEmail(), user);
-            users.remove(userId);
         } else throw new ResourceNotFoundException("User not found" + userId);
 
     }
@@ -97,12 +96,11 @@ public class AuthorizationService {
     }
 
     public void declineUser(Long userId) {
-        users.remove(userId);
+        userQueue.getUser(userId);
     }
 
     public List<User> getUsers() {
-//        return userRepository.findAll();
-        return users.values().stream().toList();
+        return userQueue.getAllUsers();
     }
 
     public void approveComment(Integer commentId) {
@@ -116,10 +114,7 @@ public class AuthorizationService {
         return commentService.createComment(comment);
     }
 
-    private Long findUserByEmail(String email) {
-        var user = users.values().stream().filter(el -> el.getEmail().equals(email)).findFirst();
-        return user.map(User::getId).orElse(null);
-    }
+
 
     public User updateUserPassword(VerifiedUserDTO user) {
         if (verifyUser(user.code(), user.email()) != null) {
@@ -144,7 +139,7 @@ public class AuthorizationService {
     public User verifyUser(String code, String email) {
         boolean valid = verificationService.verifyCode(email, code);
         if (valid) {
-            User user = approvedUsers.get(email);
+            User user = userQueue.getUserByEmail(email);
             if (user == null) throw new ResourceNotFoundException("NO user with this email");
             return userRepository.save(user);
         } else throw new UserNotVerifiedException("User " + email + " not verified");
